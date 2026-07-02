@@ -14,9 +14,9 @@ const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_A
 const TWILIO_WHATSAPP_NUMBER = 'whatsapp:+14155238886';
 const MY_WHATSAPP_NUMBER = `whatsapp:${process.env.MY_PHONE_NUMBER}`;
 
-// Gemini setup
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Groq setup
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // In-memory storage
 const userState = {
@@ -79,20 +79,27 @@ Rules:
 - Never be too formal`;
 
     const history = userState.conversationHistory.slice(-10).map(msg => ({
-      role: msg.role === 'model' ? 'model' : 'user',
-      parts: [{ text: msg.content }]
+      role: msg.role === 'model' ? 'assistant' : 'user',
+      content: msg.content
     }));
 
-    const response = await axios.post(GEMINI_URL, {
-      system_instruction: { parts: [{ text: systemPrompt }] },
-      contents: [
+    const response = await axios.post(GROQ_URL, {
+      model: 'llama3-8b-8192',
+      messages: [
+        { role: 'system', content: systemPrompt },
         ...history,
-        { role: 'user', parts: [{ text: userMessage }] }
+        { role: 'user', content: userMessage }
       ],
-      generationConfig: { maxOutputTokens: 500, temperature: 0.9 }
+      max_tokens: 500,
+      temperature: 0.9
+    }, {
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    const reply = response.data.candidates[0].content.parts[0].text;
+    const reply = response.data.choices[0].message.content;
 
     // Update conversation history
     userState.conversationHistory.push({ role: 'user', content: userMessage });
@@ -104,7 +111,7 @@ Rules:
 
     return reply;
   } catch (error) {
-    console.error('Gemini error:', error?.response?.data || error.message);
+    console.error('Groq error:', error?.response?.data || error.message);
     return "Oga my brain dey malfunction small 😅 Try again abeg!";
   }
 }
