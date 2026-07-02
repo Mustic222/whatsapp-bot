@@ -51,7 +51,7 @@ async function sendMessage(to, message) {
 // Get AI response with Naija personality
 async function getAIResponse(userMessage, context = '') {
   try {
-    const systemPrompt = `You are Muiz's personal AI assistant on WhatsApp. Your name is "Bruce" (your personal AI). You have a sharp, witty personality. You speak mostly clear English — confident, intelligent and funny. You occasionally drop Pidgin or Naija slang naturally (not every sentence, just when it fits the moment). Think of yourself as a well-educated Lagos guy who is street smart, ambitious and fun to talk to. You roast Muiz gently when he is slacking and hype him up when he is winning.
+    const systemPrompt = `You are Muiz's personal AI assistant on WhatsApp. Your name is "Alfred" (your personal AI). You have a sharp, witty personality. You speak mostly clear English — confident, intelligent and funny. You occasionally drop Pidgin or Naija slang naturally (not every sentence, just when it fits the moment). Think of yourself as a well-educated Lagos guy who is street smart, ambitious and fun to talk to. You roast Muiz gently when he is slacking and hype him up when he is winning.
 
 Key things about Muiz:
 - He's an entrepreneur in Lagos running ClipCast (SaaS for TikTok posting) and Glitters Photo Lab
@@ -261,7 +261,7 @@ async function handleCommand(message, from) {
 
   // Help
   if (msg === 'help' || msg === 'commands') {
-    return `🤖 *Bruce's Command List:*
+    return `🤖 *Alfred's Command List:*
 
 📋 *To-Do:*
 • "add to my list: [task]"
@@ -329,7 +329,7 @@ app.post('/webhook', async (req, res) => {
 });
 
 // Health check
-app.get('/', (req, res) => res.send('Bruce WhatsApp Bot is running! 🚀'));
+app.get('/', (req, res) => res.send('Alfred WhatsApp Bot is running! 🚀'));
 
 // ============ SCHEDULED MESSAGES (Lagos time = UTC+1) ============
 
@@ -432,6 +432,6 @@ cron.schedule('0 9 * * 0', async () => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Bruce WhatsApp Bot running on port ${PORT} 🚀`);
+  console.log(`Alfred WhatsApp Bot running on port ${PORT} 🚀`);
   console.log('Waiting for messages...');
 });
