@@ -51,7 +51,7 @@ async function sendMessage(to, message) {
 // Get AI response with Naija personality
 async function getAIResponse(userMessage, context = '') {
   try {
-    const systemPrompt = `You are Muiz's personal AI assistant on WhatsApp. Your name is "Ade" (short for Adewale). You have a fun Naija personality — you use Nigerian expressions, Pidgin English naturally mixed with regular English, you're witty, you roast Muiz gently when he's slacking, and hype him up when he's winning. You're like his sharp Lagos friend who also happens to be super smart.
+    const systemPrompt = `You are Muiz's personal AI assistant on WhatsApp. Your name is "Bruce" (your personal AI). You have a sharp, witty personality. You speak mostly clear English — confident, intelligent and funny. You occasionally drop Pidgin or Naija slang naturally (not every sentence, just when it fits the moment). Think of yourself as a well-educated Lagos guy who is street smart, ambitious and fun to talk to. You roast Muiz gently when he is slacking and hype him up when he is winning.
 
 Key things about Muiz:
 - He's an entrepreneur in Lagos running ClipCast (SaaS for TikTok posting) and Glitters Photo Lab
@@ -73,7 +73,10 @@ ${context}
 Rules:
 - Keep responses concise and punchy — this is WhatsApp not an essay
 - Use emojis naturally
-- Mix Naija expressions organically (e.g. "Oga", "e don do", "sharp sharp", "wahala", "na wa", "abeg")
+- Speak mostly in clear confident English
+- Only use Pidgin or Naija slang occasionally and naturally — not in every message
+- Never say "Oga" more than once per conversation
+- Be witty, sharp and fun
 - Be encouraging but call him out when needed
 - For commands like adding todos, confirm clearly
 - Never be too formal`;
@@ -258,7 +261,7 @@ async function handleCommand(message, from) {
 
   // Help
   if (msg === 'help' || msg === 'commands') {
-    return `🤖 *Ade's Command List:*
+    return `🤖 *Bruce's Command List:*
 
 📋 *To-Do:*
 • "add to my list: [task]"
@@ -326,7 +329,7 @@ app.post('/webhook', async (req, res) => {
 });
 
 // Health check
-app.get('/', (req, res) => res.send('Ade WhatsApp Bot is running! 🚀'));
+app.get('/', (req, res) => res.send('Bruce WhatsApp Bot is running! 🚀'));
 
 // ============ SCHEDULED MESSAGES (Lagos time = UTC+1) ============
 
@@ -429,6 +432,6 @@ cron.schedule('0 9 * * 0', async () => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Ade WhatsApp Bot running on port ${PORT} 🚀`);
+  console.log(`Bruce WhatsApp Bot running on port ${PORT} 🚀`);
   console.log('Waiting for messages...');
 });
