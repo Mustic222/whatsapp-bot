@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const twilio = require('twilio');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
 const cron = require('node-cron');
 
 const app = express();
@@ -15,7 +15,8 @@ const TWILIO_WHATSAPP_NUMBER = 'whatsapp:+14155238886';
 const MY_WHATSAPP_NUMBER = `whatsapp:${process.env.MY_PHONE_NUMBER}`;
 
 // Gemini setup
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 // In-memory storage
 const userState = {
@@ -50,8 +51,6 @@ async function sendMessage(to, message) {
 // Get AI response with Naija personality
 async function getAIResponse(userMessage, context = '') {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
-
     const systemPrompt = `You are Muiz's personal AI assistant on WhatsApp. Your name is "Ade" (short for Adewale). You have a fun Naija personality — you use Nigerian expressions, Pidgin English naturally mixed with regular English, you're witty, you roast Muiz gently when he's slacking, and hype him up when he's winning. You're like his sharp Lagos friend who also happens to be super smart.
 
 Key things about Muiz:
@@ -79,28 +78,33 @@ Rules:
 - For commands like adding todos, confirm clearly
 - Never be too formal`;
 
-    const chat = model.startChat({
-      history: userState.conversationHistory.slice(-10).map(msg => ({
-        role: msg.role,
-        parts: [{ text: msg.content }]
-      }))
+    const history = userState.conversationHistory.slice(-10).map(msg => ({
+      role: msg.role === 'model' ? 'model' : 'user',
+      parts: [{ text: msg.content }]
+    }));
+
+    const response = await axios.post(GEMINI_URL, {
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [
+        ...history,
+        { role: 'user', parts: [{ text: userMessage }] }
+      ],
+      generationConfig: { maxOutputTokens: 500, temperature: 0.9 }
     });
 
-    const result = await chat.sendMessage(`${systemPrompt}\n\nUser: ${userMessage}`);
-    const response = result.response.text();
+    const reply = response.data.candidates[0].content.parts[0].text;
 
     // Update conversation history
     userState.conversationHistory.push({ role: 'user', content: userMessage });
-    userState.conversationHistory.push({ role: 'model', content: response });
+    userState.conversationHistory.push({ role: 'model', content: reply });
 
-    // Keep history manageable
     if (userState.conversationHistory.length > 20) {
       userState.conversationHistory = userState.conversationHistory.slice(-20);
     }
 
-    return response;
+    return reply;
   } catch (error) {
-    console.error('Gemini error:', error);
+    console.error('Gemini error:', error?.response?.data || error.message);
     return "Oga my brain dey malfunction small 😅 Try again abeg!";
   }
 }
